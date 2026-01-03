@@ -407,19 +407,10 @@ jumpPowerValue = Options.JumpPowerSlider.Value
 applyJumpPower()
 end)
 
-local JumpConnection
 Movement:AddToggle('InfiniteJump', {
     Text = "无限跳跃",
     Default = false
 })
-table.insert(Connections, UserInputService.JumpRequest:Connect(function()
-task.wait(0.3)
-if Toggles.InfiniteJump.Value then
-if Character then
-Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-end
-end
-end))
 if LocalPlayer.PlayerGui.MainUI.MainFrame.MobileButtons:FindFirstChild("JumpButton") then
 JumpConnection = LocalPlayer.PlayerGui.MainUI.MainFrame.MobileButtons.JumpButton.MouseButton1Click:Connect(function()
 if Toggles and Toggles.InfiniteJump and Toggles.InfiniteJump.Value then
@@ -429,6 +420,15 @@ end
 end
 end)
 end
+table.insert(Connections, UserInputService.JumpRequest:Connect(function()
+task.wait(0.3)
+if Toggles.InfiniteJump.Value then
+if Character then
+Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+end
+end
+end))
+
 
 Movement:AddToggle('Noacceleration', {
     Text = "无加速度",
@@ -1434,7 +1434,7 @@ Callback = function(Value)
 if Value then
 if not Toggles.AntiHear.Value then
 Toggles.AntiHear:SetValue(true)
-Library:Notify("自动开启防飞哥听力功能只有这样上帝模式才能工作",3)
+Library:Notify("自动开启防飞哥听力功能只有这样位置欺骗才能工作",3)
 end
 Character.Collision.Size = Vector3.new(1, 0.001, 5)
 Character.Humanoid.HipHeight = 0.0001
@@ -1457,18 +1457,6 @@ end,
 ChangedCallback = function(New)
 end
 })
-if Options.GMDropdown and Options.GMDropdown.Value == "自动" then
-local Entitys = workspace:FindFirstChild("RushMoving") or 
-workspace:FindFirstChild("AmbushMoving") or 
-workspace:FindFirstChild("GlitchRush") or 
-workspace:FindFirstChild("GlitchAmbush") or 
-workspace:FindFirstChild("BackdoorRush")
-if Entitys and not Toggles.GodMode.Value then
-Toggles.GodMode:SetValue(true)
-elseif not Entitys and Toggles.GodMode.Value then
-Toggles.GodMode:SetValue(false)
-end
-end
 Bypass:AddDropdown("GMDropdown", {
     Values = { "自动", "切换" },
     Default = 2,
@@ -4591,7 +4579,6 @@ end
 Self:AddDivider()
 
 local FOVhandler = {mem={o=nil,r=nil,u=nil,base={}}, loop=false, cam=nil}
-local View = 70
 local function FOVstep()
 local parent = LocalPlayer.PlayerGui
 if not parent then return end
@@ -4624,6 +4611,7 @@ RunService:BindToRenderStep("FOV_SYS", Enum.RenderPriority.Camera.Value+1, FOVst
 workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function()
 FOVhandler.cam = workspace.CurrentCamera
 end)
+local View = 70
 Self:AddSlider("FieldofViewAdjust", {
     Text = "视野滑块",
     Default = 70,
@@ -4631,7 +4619,7 @@ Self:AddSlider("FieldofViewAdjust", {
     Max = 120,
     Rounding = 1,
     Compact = false,
-Callback = function(Value)
+    Callback = function(Value)
 View = Value
 if not FOVhandler.mem.base[1] then
 FOVhandler.mem.base[1] = Instance.new("NumberValue", LocalPlayer.PlayerGui)
@@ -4649,7 +4637,7 @@ end
 Self:AddToggle('Fieldofview', {
     Text = "视野",
     Default = false,
-Callback = function(Value)
+    Callback = function(Value)
 if Value then
 FOVhandler.loop = true
 if not FOVhandler.mem.base[1] then
@@ -5422,17 +5410,26 @@ Modifiers:AddToggle('AntiLookman', {
     Default = false
 })
 
-Modifiers:AddToggle('AntiGiggle', {
-    Text = "防 Giggle",
-    Default = false,
+Modifiers:AddToggle('AntiGiggle',{
+     Text = "防 Giggle",
+     Default = false,
 Callback = function(Value)
 for _, v in ipairs(workspace.CurrentRooms:GetDescendants()) do
 if v.Name == "GiggleCeiling" then
-v:WaitForChild("Hitbox", 9e9).CanTouch = not Value
+v:WaitForChild("Hitbox",9e9).CanTouch = not Value
 end
 end
 end
 })
+LocalPlayer:GetAttributeChangedSignal("CurrentRoom"):Connect(function()
+if Toggles.AntiGiggle and Toggles.AntiGiggle.Value then
+for _, v in ipairs(workspace.CurrentRooms[LocalPlayer:GetAttribute("CurrentRoom")]:GetChildren()) do
+if v.Name == "GiggleCeiling" then
+v:WaitForChild("Hitbox",9e9).CanTouch = false
+end
+end
+end
+end)
 
 Modifiers:AddToggle('AntiJam', {
     Text = "防 Jamming",
@@ -5473,6 +5470,15 @@ end
 end
 end
 })
+table.insert(Connections, RunService.Heartbeat:Connect(function(dt)
+if Toggles.AntiGloomPile and Toggles.AntiGloomPile.Value then
+for _, v in ipairs(workspace.CurrentRooms:GetDescendants()) do
+if v.Name == "GloomEgg" then
+v:WaitForChild("Egg", 9e9).CanTouch = false
+end
+end
+end
+end))
 
 Modifiers:AddToggle('AntiVacuum', {
     Text = "防 Vacuum",
@@ -5548,6 +5554,25 @@ end
 if Toggles.NoCutscenes.Value then
 if (ReplicatedStorage.GameData.LatestRoom.Value > 89) then
 Toggles.NoCutscenes:SetValue(false)
+end
+end
+
+if Toggles.AntiLookman.Value then
+if Workspace:FindFirstChild("BackdoorLookman") then
+RemoteFolder.MotorReplication:FireServer(-890)
+end
+end
+
+if Options.GMDropdown and Options.GMDropdown.Value == "自动" then
+local Entitys = workspace:FindFirstChild("RushMoving") or 
+workspace:FindFirstChild("AmbushMoving") or 
+workspace:FindFirstChild("GlitchRush") or 
+workspace:FindFirstChild("GlitchAmbush") or 
+workspace:FindFirstChild("BackdoorRush")
+if Entitys and not Toggles.GodMode.Value then
+Toggles.GodMode:SetValue(true)
+elseif not Entitys and Toggles.GodMode.Value then
+Toggles.GodMode:SetValue(false)
 end
 end
 
