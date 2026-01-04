@@ -26,6 +26,13 @@ Workspace = game:GetService("Workspace")
 SoundService = game:GetService("SoundService")
 Debris = game:GetService("Debris")
 
+if LocalPlayer:GetAttribute("SapphireLoaded") then 
+print("[防重复加载] 脚本已结束")
+return
+end
+
+LocalPlayer:SetAttribute("SapphireLoaded", true)
+
 notifysound = 4590657391
 
 PlayingSound = true
@@ -84,12 +91,12 @@ end
 end
 
 Achievement = (function()
-Players = game:GetService("Players")
-TS = game:GetService("TweenService")
-Plr = Players.LocalPlayer
+local Players = game:GetService("Players")
+local TS = game:GetService("TweenService")
+local Plr = Players.LocalPlayer
 return function(data)
 task.spawn(function()
-frame = Plr.PlayerGui.GlobalUI.AchievementsHolder.Achievement:Clone()
+local frame = Plr.PlayerGui.GlobalUI.AchievementsHolder.Achievement:Clone()
 frame.Name = "LiveAchievement"
 frame.Frame.Details.Title.Text = data.Title
 frame.Frame.Details.Desc.Text = data.Desc
@@ -246,7 +253,7 @@ SettingsBox = Tabs.UISettings:AddLeftGroupbox('UI','wrench')
 
 Tabs.Homepage:UpdateWarningBox({
 Title = "更新日志：",
-Text = "//Doors//\n<font color=\"rgb(73,230,133)\">适配Doors</font>",
+Text = "//Doors//\n<font color=\"rgb(73,230,133)\">修复Doors通知样式\n防重加载脚本</font>",
 IsNormal = true,
 Visible = true,
 LockSize = true,
@@ -3762,7 +3769,7 @@ end
 
 table.insert(Connections, workspace.ChildAdded:Connect(function(v)
 if Toggles.EntityNotifys and Toggles.EntityNotifys.Value then  
-if v.Name == "RushMoving" and Options.EntitiesPicker and Options.EntitiesPicker.Value["Rush"] then
+if v.Name == "RushMoving" and Options.EntitiesPicker.Value["Rush"] then
 if OptionNotify == "Doors" then
 Achievement({
 Title = "Rush",
@@ -3778,7 +3785,7 @@ Library:Notify("Rush 已生成！快去寻找躲藏点！", 3)
 Sound()
 end
 end
-if v.Name == "BackdoorRush" and Options.EntitiesPicker and Options.EntitiesPicker.Value["Blitz"] then
+if v.Name == "BackdoorRush" and Options.EntitiesPicker.Value["Blitz"] then
 if OptionNotify == "Doors" then
 Achievement({
 Title = "Blitz",
@@ -3794,7 +3801,7 @@ Library:Notify("Blitz 已生成！快去寻找躲藏点！", 3)
 Sound()
 end
 end
-if v.Name == "BackdoorLookman" and Options.EntitiesPicker and Options.EntitiesPicker.Value["Lookman"] then
+if v.Name == "BackdoorLookman" and Options.EntitiesPicker.Value["Lookman"] then
 if OptionNotify == "Doors" then
 Achievement({
 Title = "Lookman",
@@ -3810,7 +3817,7 @@ Library:Notify("Lookman 已生成！不要直视它！", 3)
 Sound()
 end
 end
-if v.Name == "AmbushMoving" and Options.EntitiesPicker and Options.EntitiesPicker.Value["Ambush"] then
+if v.Name == "AmbushMoving" and Options.EntitiesPicker.Value["Ambush"] then
 if OptionNotify == "Doors" then
 Achievement({
 Title = "Ambush",
@@ -3826,7 +3833,7 @@ Library:Notify("Ambush 已生成！快去寻找躲藏点！", 3)
 Sound()
 end
 end
-if v.Name == "A60" and Options.EntitiesPicker and Options.EntitiesPicker.Value["A-60"] then
+if v.Name == "A60" and Options.EntitiesPicker.Value["A-60"] then
 if OptionNotify == "Doors" then
 Achievement({
 Title = "A-60",
@@ -3842,7 +3849,7 @@ Library:Notify("A-60 已生成！快去寻找躲藏点！", 3)
 Sound()
 end
 end
-if v.Name == "A120" and Options.EntitiesPicker and Options.EntitiesPicker.Value["A-120"] then
+if v.Name == "A120" and Options.EntitiesPicker.Value["A-120"] then
 if OptionNotify == "Doors" then
 Achievement({
 Title = "A-120",
@@ -3858,7 +3865,7 @@ Library:Notify("A-120 已生成！快去寻找躲藏点！", 3)
 Sound()
 end
 end
-if v.Name == "Eyes" and Options.EntitiesPicker and Options.EntitiesPicker.Value["Eyes"] then
+if v.Name == "Eyes" and Options.EntitiesPicker.Value["Eyes"] then
 if OptionNotify == "Doors" then
 Achievement({
 Title = "Eyes",
@@ -3874,7 +3881,7 @@ Library:Notify("Eyes 已生成！不要直视它！", 3)
 Sound()
 end
 end
-if v.Name == "GlitchRush" and Options.EntitiesPicker and Options.EntitiesPicker.Value["GlitchRush"] then
+if v.Name == "GlitchRush" and Options.EntitiesPicker.Value["GlitchRush"] then
 if OptionNotify == "Doors" then
 Achievement({
 Title = "GlitchRush",
@@ -3890,7 +3897,7 @@ Library:Notify("GlitchRush 已生成！快去寻找躲藏点！", 3)
 Sound()
 end
 end
-if v.Name == "GlitchAmbush" and Options.EntitiesPicker and Options.EntitiesPicker.Value["GlitchAmbush"] then
+if v.Name == "GlitchAmbush" and Options.EntitiesPicker.Value["GlitchAmbush"] then
 if OptionNotify == "Doors" then
 Achievement({
 Title = "GlitchAmbush",
@@ -3906,7 +3913,7 @@ Library:Notify("GlitchAmbush 已生成！快去寻找躲藏点！", 3)
 Sound()
 end
 end
-if v.Name == "Groundskeeper" and Options.EntitiesPicker and Options.EntitiesPicker.Value["Groundskeeper"] then
+if v.Name == "Groundskeeper" and Options.EntitiesPicker.Value["Groundskeeper"] then
 if OptionNotify == "Doors" then
 Achievement({
 Title = "Groundskeeper",
@@ -3922,7 +3929,7 @@ Library:Notify("Groundskeeper 已生成！不要踩踏草坪！", 3)
 Sound()
 end
 end
-if v.Name == "MonumentEntity" and Options.EntitiesPicker and Options.EntitiesPicker.Value["Monument"] then
+if v.Name == "MonumentEntity" and Options.EntitiesPicker.Value["Monument"] then
 if OptionNotify == "Doors" then
 Achievement({
 Title = "Monument",
@@ -3938,7 +3945,7 @@ Library:Notify("Monument 已生成！看着它！", 3)
 Sound()
 end
 end
-if v.Name == "SeekMovingNewClone" and Options.EntitiesPicker and Options.EntitiesPicker.Value["Seek"] then
+if v.Name == "SeekMovingNewClone" and Options.EntitiesPicker.Value["Seek"] then
 if OptionNotify == "Doors" then
 Achievement({
 Title = "Seek",
@@ -3963,7 +3970,7 @@ if currentRoom then
 local room = workspace.CurrentRooms:FindFirstChild(tostring(currentRoom))
 if room then
 local v = room:FindFirstChild("Groundskeeper", true)
-if v and Options.EntitiesPicker and Options.EntitiesPicker.Value["Groundskeeper"] then
+if v and Options.EntitiesPicker.Value["Groundskeeper"] then
 if OptionNotify == "Doors" then
 Achievement({
 Title = "Groundskeeper",
@@ -5925,6 +5932,8 @@ if AutoLibraryCodeConnection then
 AutoLibraryCodeConnection:Disconnect()
 AutoLibraryCodeConnection = nil
 end
+
+LocalPlayer:SetAttribute("StarringLoaded", false)
 
 if autoGlitchConnection then
 autoGlitchConnection:Disconnect()
