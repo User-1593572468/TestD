@@ -152,7 +152,11 @@ ESPLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/mstudio4
 ESPLibrary.GlobalConfig.Tracers = false
 ESPLibrary.GlobalConfig.Arrows = false
 
+if Checkbox == nil then
 Library.ForceCheckbox = true
+else
+Library.ForceCheckbox = Checkbox
+end
 Library.NotifySide = "Right"
 
 Library:Notify("正在加载 Sapphire | Doors",5)
@@ -253,7 +257,7 @@ SettingsBox = Tabs.UISettings:AddLeftGroupbox('UI','wrench')
 
 Tabs.Homepage:UpdateWarningBox({
 Title = "更新日志：",
-Text = "//Doors//\n<font color=\"rgb(73,230,133)\">修复Doors通知样式\n防重加载脚本</font>",
+Text = "//Doors//\n<font color=\"rgb(73,230,133)\">小更新</font>",
 IsNormal = true,
 Visible = true,
 LockSize = true,
@@ -6061,7 +6065,7 @@ if Character and Character.Humanoid then
 Character.Humanoid.WalkSpeed = 16
 Character.Humanoid.JumpPower = 50
 Character.Humanoid.JumpHeight = 7.2
-Character.Humanoid.MaxSlopeAngle = 89
+Character.Humanoid.MaxSlopeAngle = 45
 
 if Character:FindFirstChild("Collision") then
 Character.Collision.CanCollide = true
