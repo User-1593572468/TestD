@@ -246,7 +246,7 @@ SettingsBox = Tabs.UISettings:AddLeftGroupbox('UI','wrench')
 
 Tabs.Homepage:UpdateWarningBox({
 Title = "更新日志：",
-Text = "//Doors//\n<font color=\"rgb(73,230,133)\">改进防重加载脚本\n改进位置欺骗 (不再失效)</font>",
+Text = "//Doors//\n<font color=\"rgb(73,230,133)\">新增假死 (有bug)</font>",
 IsNormal = true,
 Visible = true,
 LockSize = true,
@@ -1870,6 +1870,75 @@ if InfiniteCrucifixConnection then
 InfiniteCrucifixConnection:Disconnect()
 InfiniteCrucifixConnection = nil
 end
+end
+end
+})
+
+SecondLiveConnection = nil
+OriginalGravity = workspace.Gravity
+local function setupSecondLive()
+local ReplicatedStore = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local humanoid = player.Character and player.Character:FindFirstChild("Humanoid") or player.Character:WaitForChild("Humanoid")
+if SecondLiveConnection then
+SecondLiveConnection:Disconnect()
+end
+SecondLiveConnection = humanoid.Died:Connect(function()
+task.delay(0.5, function()
+workspace.Gravity = 0
+char = player.Character
+if not char then return end
+hum = char:FindFirstChild("Humanoid")
+root = char:FindFirstChild("HumanoidRootPart")
+if not hum or not root then return end
+gui = player:FindFirstChild("PlayerGui")
+if gui then
+ui = gui:FindFirstChild("MainUI")
+if ui then
+d1 = ui:FindFirstChild("DeathPanel")
+if d1 then d1:Destroy() end
+d2 = ui:FindFirstChild("Death")
+if d2 then d2:Destroy() end
+end
+end
+hum.Health = hum.MaxHealth
+hum.AutomaticScalingEnabled = true
+if char:GetAttribute("Stunned") then
+char:SetAttribute("Stunned", false)
+end
+room = ReplicatedStore.GameData.LatestRoom.Value
+rm = workspace.CurrentRooms:FindFirstChild(room)
+door = rm and rm:FindFirstChild("Door") and rm.Door:FindFirstChild("Door")
+if door then
+root.CFrame = door.CFrame + Vector3.new(0, 3, 0)
+task.delay(1, function()
+if SecondLiveConnection then
+workspace.Gravity = OriginalGravity
+end
+end)
+end
+end)
+end)
+end
+Bypass:AddButton({
+    Text = "假死",
+DoubleClick = true,
+Risky = true,
+Func = function()
+local currentRoom = LocalPlayer:GetAttribute("CurrentRoom") or ReplicatedStorage.GameData.LatestRoom.Value
+if currentRoom >= 1 then
+setupSecondLive()
+player.CharacterAdded:Connect(function()
+setupSecondLive()
+end)
+task.wait(1)
+replicatesignal(LocalPlayer.Kill)
+task.wait(1)
+game:GetService("CoreGui"):FindFirstChild("RobloxGui").Backpack.Visible = true
+game:GetService("Players").LocalPlayer:SetAttribute("Alive",true)
+else
+Library:Notify("进入下一个房间后假死才能正常工作", 5)
 end
 end
 })
@@ -5927,7 +5996,7 @@ AutoLibraryCodeConnection:Disconnect()
 AutoLibraryCodeConnection = nil
 end
 
-LocalPlayer:SetAttribute("StarringLoaded", nil)
+LocalPlayer:SetAttribute("SapphireLoaded", nil)
 
 if autoGlitchConnection then
 autoGlitchConnection:Disconnect()
