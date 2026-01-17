@@ -246,7 +246,7 @@ SettingsBox = Tabs.UISettings:AddLeftGroupbox('UI','wrench')
 
 Tabs.Homepage:UpdateWarningBox({
 Title = "更新日志：",
-Text = "//Doors//\n<font color=\"rgb(73,230,133)\">新增假死 (有bug)</font>",
+Text = "//Doors//\n<font color=\"rgb(73,230,133)\">修复物品ESP\n新增房间传送</font>",
 IsNormal = true,
 Visible = true,
 LockSize = true,
@@ -1937,6 +1937,7 @@ replicatesignal(LocalPlayer.Kill)
 task.wait(1)
 game:GetService("CoreGui"):FindFirstChild("RobloxGui").Backpack.Visible = true
 game:GetService("Players").LocalPlayer:SetAttribute("Alive",true)
+game:GetService("Players").LocalPlayer:SetAttribute("FakeDeath",true)
 else
 Library:Notify("进入下一个房间后假死才能正常工作", 5)
 end
@@ -3284,6 +3285,15 @@ end
 end
 end
 end
+local dropsFolder = workspace:FindFirstChild("Drops")
+if dropsFolder then
+for _, drop in ipairs(dropsFolder:GetChildren()) do
+local itemName = Item[drop.Name]
+if itemName and drop:IsA("Model") and drop.PrimaryPart then
+AddItemESP(drop, itemName, ItemsColor)
+end
+end
+end
 end
 local function ClearAllItemsESP()
 for model, espObject in pairs(ItemsESPObjects) do
@@ -3295,7 +3305,7 @@ ItemsESPObjects = {}
 end
 ESP:AddToggle('Items', {
     Text = "物品",
-    Default = false,
+Default = false,
 Callback = function(Value)
 if Value then
 ScanAndAddItemsESP()
@@ -3306,7 +3316,7 @@ end
 }):AddColorPicker('ItemsColorPicker', {
     Default = ItemsColor,
     Title = '物品颜色',
-    Transparency = 0,
+Transparency = 0,
 Callback = function(Value)
 ItemsColor = Value
 if Toggles.Items and Toggles.Items.Value then
@@ -3339,7 +3349,7 @@ local itemName = Item[v.Name]
 if itemName and v:IsA("Model") and v.PrimaryPart then
 local parent = v.Parent
 while parent and parent ~= workspace do
-if parent:IsDescendantOf(workspace.CurrentRooms) then
+if parent:IsDescendantOf(workspace.CurrentRooms) or parent.Name == "Drops" then
 AddItemESP(v, itemName, ItemsColor)
 break
 end
@@ -5080,6 +5090,52 @@ noPuzzleDoorsRunning = false
 if noPuzzleDoorsConnection then
 noPuzzleDoorsConnection:Disconnect()
 noPuzzleDoorsConnection = nil
+end
+end
+end
+})
+end
+
+if Floor.Value == "Rooms" then
+teleportToRoomEnabled = false
+teleportToRoomConnection = nil
+FloorAnti:AddToggle('TeleportToNextRoom', {
+    Text = "房间传送",
+    Default = false,
+Callback = function(Value)
+teleportToRoomEnabled = Value
+if Value then
+if game:GetService("Players").LocalPlayer:GetAttribute("FakeDeath") == true then
+teleportToRoomConnection = RunService.Heartbeat:Connect(function()
+if not teleportToRoomEnabled then 
+return 
+end
+local targetRoomNumber = ReplicatedStorage.GameData.LatestRoom.Value
+local targetRoom = workspace.CurrentRooms:FindFirstChild(tostring(targetRoomNumber))
+if not targetRoom then
+return
+end
+local targetDoor = targetRoom:FindFirstChild("Door")
+if not targetDoor then
+return
+end
+local doorPart = targetDoor:FindFirstChild("Door")
+if not doorPart then
+return
+end
+local character = LocalPlayer.Character
+if not character then return end
+local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+if not humanoidRootPart then return end
+local doorCFrame = doorPart.CFrame
+local teleportPosition = doorCFrame.Position + doorCFrame.LookVector * -1
+character:PivotTo(CFrame.new(teleportPosition, doorCFrame.Position))
+end)
+else
+if teleportToRoomConnection then
+teleportToRoomConnection:Disconnect()
+teleportToRoomConnection = nil
+end
 end
 end
 end
