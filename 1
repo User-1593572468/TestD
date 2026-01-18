@@ -31,6 +31,7 @@ RequiredMainGame = require(LocalPlayer.PlayerGui.MainUI.Initiator.Main_Game)
 RemoteListener = MainGame.RemoteListener
 Modules = RemoteListener.Modules
 ClientModules = game:GetService("ReplicatedStorage"):FindFirstChild("ModulesClient") or game:GetService("ReplicatedStorage"):FindFirstChild("ClientModules") 
+Modifiers = ReplicatedStorage:WaitForChild("LiveModifiers")
 
 Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 
@@ -239,14 +240,14 @@ Effect = TabBox3:AddTab('效果')
 
 FloorAnti = Tabs.Floor:AddLeftGroupbox('楼层绕过')
 Other = Tabs.Floor:AddRightGroupbox("其它")
-Modifiers = Tabs.Floor:AddLeftGroupbox('修饰符')
+ModifiersBox = Tabs.Floor:AddLeftGroupbox('修饰符')
 Farm = Tabs.Floor:AddLeftGroupbox("农场")
 
 SettingsBox = Tabs.UISettings:AddLeftGroupbox('UI','wrench')
 
 Tabs.Homepage:UpdateWarningBox({
 Title = "更新日志：",
-Text = "//Doors//\n<font color=\"rgb(73,230,133)\">修复物品ESP\n新增房间传送</font>",
+Text = "//Doors//\n<font color=\"rgb(73,230,133)\">修复防 Jamming\n修复UI样式LinoriaLib\n改进假死</font>",
 IsNormal = true,
 Visible = true,
 LockSize = true,
@@ -1938,6 +1939,7 @@ task.wait(1)
 game:GetService("CoreGui"):FindFirstChild("RobloxGui").Backpack.Visible = true
 game:GetService("Players").LocalPlayer:SetAttribute("Alive",true)
 game:GetService("Players").LocalPlayer:SetAttribute("FakeDeath",true)
+Library:Notify("拾取创口贴后恢复所有互动", 5)
 else
 Library:Notify("进入下一个房间后假死才能正常工作", 5)
 end
@@ -2010,6 +2012,7 @@ SettingsESP:AddSlider('GlobalTextSize', {
     Default = 16,
     Min = 10,
     Max = 50,
+    Rounding = 0,
     Compact = true,
 Callback = function(Value)
 ESPGlobalSettings.TextSize = Value
@@ -5518,7 +5521,7 @@ end
 })
 end
 
-Modifiers:AddToggle('AntiA90', {
+ModifiersBox:AddToggle('AntiA90', {
     Text = "防 A90",
     Default = false,
 Callback = function(Value)
@@ -5529,12 +5532,12 @@ end
 end
 })
 
-Modifiers:AddToggle('AntiLookman', {
+ModifiersBox:AddToggle('AntiLookman', {
     Text = "防 Lookman",
     Default = false
 })
 
-Modifiers:AddToggle('AntiGiggle',{
+ModifiersBox:AddToggle('AntiGiggle',{
      Text = "防 Giggle",
      Default = false,
 Callback = function(Value)
@@ -5555,26 +5558,26 @@ end
 end
 end)
 
-Modifiers:AddToggle('AntiJam', {
-    Text = "防 Jamming",
-    Default = false,
+ModifiersBox:AddToggle('AntiJam',{
+     Text = "防 Jamming",
+     Default = false,
 Callback = function(Value)
 if Modifiers and not Modifiers:FindFirstChild("Jammin") then return end
-local mainTrack = game["SoundService"]:FindFirstChild("Main")
+mainTrack = game["SoundService"]:FindFirstChild("Main")
 if mainTrack then
-local jamming = mainTrack:FindFirstChild("Jamming")
+jamming = mainTrack:FindFirstChild("Jamming")
 if jamming then
 jamming.Enabled = not Value
 end
 end
-local mainUI = LocalPlayer:FindFirstChild("PlayerGui")
+mainUI = LocalPlayer:FindFirstChild("PlayerGui")
 and LocalPlayer.PlayerGui:FindFirstChild("MainUI")
 if mainUI then
-local healthGui = mainUI:FindFirstChild("Initiator")
+healthGui = mainUI:FindFirstChild("Initiator")
 and mainUI.Initiator:FindFirstChild("Main_Game")
 and mainUI.Initiator.Main_Game:FindFirstChild("Health")
 if healthGui then
-local jamSound = healthGui:FindFirstChild("Jam")
+jamSound = healthGui:FindFirstChild("Jam")
 if jamSound then
 jamSound.Playing = not Value
 end
@@ -5583,7 +5586,7 @@ end
 end
 })
 
-Modifiers:AddToggle('AntiGloomPile', {
+ModifiersBox:AddToggle('AntiGloomPile', {
     Text = "防 Gloom Egg",
     Default = false,
 Callback = function(Value)
@@ -5604,7 +5607,7 @@ end
 end
 end))
 
-Modifiers:AddToggle('AntiVacuum', {
+ModifiersBox:AddToggle('AntiVacuum', {
     Text = "防 Vacuum",
     Default = false,
 Callback = function(Value)
